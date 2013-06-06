@@ -29,17 +29,20 @@ function Get-JiraIssueStatus {
 
 	process {
 		foreach ($issueKey in $IssueKeys) {
-			Write-Host "Fetching issue $IssueKey"
+			Write-Host -NoNewline "Fetching issue status $IssueKey... "
 			$issue = $proxy.getIssue($token, $IssueKey)
 			if (-not $issue) {
-				Write-Error "Issue $issueKey not found"
+				Write-Host "[not found]"
 				continue
 			}
 
 			$statusId = $issue.status
 			$status = $statuses | ? { $_.id -eq $statusId }
+			$statusName = $status.name
 
-			$info = [pscustomobject] @{ Key = $issueKey; Status = $status.name }
+			Write-Host "[$statusName]"
+
+			$info = [pscustomobject] @{ Key = $issueKey; Status = $statusName }
 			$info
 		}
 	}
